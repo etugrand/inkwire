@@ -30,3 +30,11 @@ it("throws typed error on 401 without retrying", async () => {
     .rejects.toMatchObject({ code: "unauthorized" });
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });
+
+it("retries: 0 still makes one attempt and throws typed error", async () => {
+  const fetchMock = vi.fn(async () => new Response(JSON.stringify({ error: { code: "server_error", message: "oops" } }), { status: 500 }));
+  vi.stubGlobal("fetch", fetchMock);
+  await expect(publish("https://site.test", "k", { external_id: "e", title: "T", markdown: "x" }, { retries: 0 }))
+    .rejects.toMatchObject({ code: "server_error", httpStatus: 500 });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});

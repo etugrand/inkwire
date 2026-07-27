@@ -16,7 +16,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function publish(
   baseUrl: string, apiKey: string, payload: PostPayload, opts: { retries?: number } = {},
 ): Promise<PublishResult> {
-  const retries = opts.retries ?? 3;
+  const retries = Math.max(1, opts.retries ?? 3);
   const url = `${baseUrl.replace(/\/$/, "")}/api/posts`;
   let lastErr: unknown;
   for (let attempt = 1; attempt <= retries; attempt++) {
