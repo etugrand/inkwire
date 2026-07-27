@@ -1,10 +1,11 @@
 import re
 from datetime import datetime
 from typing import Annotated, Literal, Optional
-from pydantic import BaseModel, Field, EmailStr, ValidationError, field_validator
+from pydantic import BaseModel, Field, EmailStr, ValidationError, field_validator, AnyUrl, TypeAdapter
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 HTTP_URL = re.compile(r"^https?://")
 DATE_TIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$")
+_URL_ADAPTER = TypeAdapter(AnyUrl)
 class Author(BaseModel):
     model_config = {"extra": "forbid"}
     name: Optional[str] = None
@@ -30,6 +31,10 @@ class PostInput(BaseModel):
             return v
         if not HTTP_URL.match(v):
             raise ValueError("must be an http(s) URL")
+        try:
+            _URL_ADAPTER.validate_python(v)
+        except ValidationError:
+            raise ValueError("must be a valid URL")
         return v
 
     @field_validator("published_at")
