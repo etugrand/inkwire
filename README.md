@@ -99,7 +99,7 @@ publish("http://localhost:3000", "dev-key", {
 
 ## Status
 
-v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Client SDKs are published (`inkwire-client` on [npm](https://www.npmjs.com/package/inkwire-client) and [PyPI](https://pypi.org/project/inkwire-client/)); the TS/Python receiver cores are still consumed by path or vendored, not yet published.
+v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Published: `inkwire-client` on [npm](https://www.npmjs.com/package/inkwire-client) and [PyPI](https://pypi.org/project/inkwire-client/), and `inkwire-receiver-core` on [npm](https://www.npmjs.com/package/inkwire-receiver-core). The Python receiver core is still consumed in-repo only, not yet published.
 
 ## License
 
