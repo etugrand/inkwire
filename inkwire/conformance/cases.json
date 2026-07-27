@@ -20,5 +20,12 @@
   { "name": "explicit slug conflict -> 409", "auth": true,
     "setup": { "external_id": "c-owner", "title": "Owner", "markdown": "x", "slug": "taken-slug" },
     "body": { "external_id": "c-other", "title": "Other", "markdown": "x", "slug": "taken-slug" },
-    "expect": { "status": 409, "errorCode": "conflict" } }
+    "expect": { "status": 409, "errorCode": "conflict" } },
+  { "name": "auto-slug dedup on title collision", "auth": true,
+    "setup": { "external_id": "dup-1", "title": "Same Title", "markdown": "x" },
+    "body": { "external_id": "dup-2", "title": "Same Title", "markdown": "y" },
+    "expect": { "status": 200, "hasSlug": true } },
+  { "name": "missing markdown -> 400", "auth": true,
+    "body": { "external_id": "c-5", "title": "x" },
+    "expect": { "status": 400, "errorCode": "invalid_payload" } }
 ]
