@@ -1,6 +1,6 @@
 {
   "name": "@inkwire/receiver-express", "private": true, "type": "module",
   "scripts": { "start": "tsx src/server.ts" },
-  "dependencies": { "@inkwire/receiver-core": "file:../core-ts", "express": "^5.0.0" },
+  "dependencies": { "inkwire-receiver-core": "file:../core-ts", "express": "^5.0.0" },
   "devDependencies": { "tsx": "^4.19.0", "typescript": "^5.5.0" }
 }

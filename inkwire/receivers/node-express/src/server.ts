@@ -1,5 +1,5 @@
 import express from "express";
-import { handlePost, MemoryStore } from "@inkwire/receiver-core";
+import { handlePost, MemoryStore } from "inkwire-receiver-core";
 
 const store = new MemoryStore();
 const apiKeys = (process.env.INKWIRE_API_KEYS ?? "").split(",").map((s) => s.trim()).filter(Boolean);

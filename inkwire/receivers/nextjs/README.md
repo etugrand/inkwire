@@ -4,7 +4,7 @@ This is the reference implementation of an Inkwire receiver in a Next.js App Rou
 
 ## Overview
 
-The receiver is implemented as a single `POST /api/posts` route handler in `app/api/posts/route.ts`. It uses the shared `@inkwire/receiver-core` module to handle all validation, authorization, and business logic.
+The receiver is implemented as a single `POST /api/posts` route handler in `app/api/posts/route.ts`. It uses the shared `inkwire-receiver-core` module to handle all validation, authorization, and business logic.
 
 ## Configuration
 
@@ -18,7 +18,7 @@ INKWIRE_API_KEYS=key1,key2,key3 npm run dev
 
 ## Customization: Replacing MemoryStore
 
-This reference implementation uses `MemoryStore` from `@inkwire/receiver-core` for simplicity. In a real application, you must provide your own `PostStore` implementation backed by your database.
+This reference implementation uses `MemoryStore` from `inkwire-receiver-core` for simplicity. In a real application, you must provide your own `PostStore` implementation backed by your database.
 
 To adapt this for your app:
 
@@ -27,7 +27,7 @@ To adapt this for your app:
    to — so a single store can multi-tenant across sites/keys without them
    colliding on slug or external_id:
    ```typescript
-   import { type PostStore, type StoredPost, type UpsertInput } from "@inkwire/receiver-core";
+   import { type PostStore, type StoredPost, type UpsertInput } from "inkwire-receiver-core";
 
    export class MyPostStore implements PostStore {
      async findByExternalId(key: string, externalId: string): Promise<StoredPost | null> {

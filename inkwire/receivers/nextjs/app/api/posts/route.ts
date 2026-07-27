@@ -1,4 +1,4 @@
-import { handlePost, MemoryStore, type PostStore } from "@inkwire/receiver-core";
+import { handlePost, MemoryStore, type PostStore } from "inkwire-receiver-core";
 
 // Reference uses MemoryStore; a real app supplies its own PostStore (see README).
 const store: PostStore = new MemoryStore();

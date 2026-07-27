@@ -2,7 +2,7 @@
   "name": "@inkwire/receiver-nextjs",
   "private": true,
   "dependencies": {
-    "@inkwire/receiver-core": "file:../core-ts",
+    "inkwire-receiver-core": "file:../core-ts",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
