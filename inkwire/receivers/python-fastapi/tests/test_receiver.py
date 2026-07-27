@@ -38,3 +38,23 @@ def test_slug_conflict_409():
     client.post("/api/posts", headers=AUTH, json={"external_id": "owner", "title": "O", "markdown": "x", "slug": "taken"})
     r = client.post("/api/posts", headers=AUTH, json={"external_id": "other", "title": "X", "markdown": "x", "slug": "taken"})
     assert r.status_code == 409 and r.json()["error"]["code"] == "conflict"
+
+def test_non_object_body_400():
+    r = client.post("/api/posts", headers=AUTH, json=[1, 2, 3])
+    assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"
+
+def test_too_many_tags_400():
+    r = client.post("/api/posts", headers=AUTH, json={"external_id": "f", "title": "T", "markdown": "x", "tags": [f"t{i}" for i in range(51)]})
+    assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"
+
+def test_tag_too_long_400():
+    r = client.post("/api/posts", headers=AUTH, json={"external_id": "g", "title": "T", "markdown": "x", "tags": ["x" * 65]})
+    assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"
+
+def test_bad_published_at_400():
+    r = client.post("/api/posts", headers=AUTH, json={"external_id": "h", "title": "T", "markdown": "x", "published_at": "not-a-date-at-all"})
+    assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"
+
+def test_author_extra_field_400():
+    r = client.post("/api/posts", headers=AUTH, json={"external_id": "i", "title": "T", "markdown": "x", "author": {"name": "A", "unexpected": "nope"}})
+    assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"

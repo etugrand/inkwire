@@ -18,7 +18,7 @@ async def handle_post(auth_header, raw_body, api_keys, store):
         try:
             p = PostInput(**(raw_body or {}))
             p.validate_slug()
-        except (ValidationError, ValueError) as e:
+        except (ValidationError, ValueError, TypeError) as e:
             raise InkwireError("invalid_payload", str(e).splitlines()[0])
         if p.slug:
             owner = await store.find_by_slug(key, p.slug)
