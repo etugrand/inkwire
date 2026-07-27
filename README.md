@@ -1,5 +1,9 @@
 # Inkwire
 
+[![npm](https://img.shields.io/npm/v/inkwire-client.svg)](https://www.npmjs.com/package/inkwire-client)
+[![PyPI](https://img.shields.io/pypi/v/inkwire-client.svg)](https://pypi.org/project/inkwire-client/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A small, open protocol for publishing blog posts from any CMS or tool into any receiving website — REST + JSON, one endpoint, upsert semantics, server-side sanitization.
 
 ```
@@ -61,8 +65,12 @@ Same runner works unmodified against `receivers/nextjs` or `receivers/python-fas
 
 ### Publish from Node
 
+```bash
+npm install inkwire-client
+```
+
 ```js
-const { publish } = require("./inkwire/clients/node/dist");
+import { publish } from "inkwire-client";
 
 await publish("http://localhost:3000", "dev-key", {
   external_id: "my-post-1",
@@ -73,6 +81,10 @@ await publish("http://localhost:3000", "dev-key", {
 ```
 
 ### Publish from Python
+
+```bash
+pip install inkwire-client
+```
 
 ```python
 from inkwire_client import publish
@@ -87,4 +99,8 @@ publish("http://localhost:3000", "dev-key", {
 
 ## Status
 
-v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Not yet published to npm/PyPI — the TS/Python cores are consumed by path or vendored for now.
+v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Client SDKs are published (`inkwire-client` on [npm](https://www.npmjs.com/package/inkwire-client) and [PyPI](https://pypi.org/project/inkwire-client/)); the TS/Python receiver cores are still consumed by path or vendored, not yet published.
+
+## License
+
+[MIT](LICENSE)
