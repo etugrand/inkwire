@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://inkwire.dev/schema/inkwire-post.schema.json",
+  "title": "Inkwire Post v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["external_id", "title", "markdown"],
+  "properties": {
+    "external_id": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "markdown": { "type": "string", "minLength": 1 },
+    "slug": { "type": "string", "maxLength": 255, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "excerpt": { "type": "string", "maxLength": 1024 },
+    "tags": { "type": "array", "items": { "type": "string", "maxLength": 64 }, "maxItems": 50 },
+    "cover_image_url": { "type": "string", "format": "uri" },
+    "canonical_url": { "type": "string", "format": "uri" },
+    "author": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "name": { "type": "string" }, "email": { "type": "string", "format": "email" } }
+    },
+    "status": { "type": "string", "enum": ["draft", "published"], "default": "draft" },
+    "published_at": { "type": "string", "format": "date-time" }
+  }
+}

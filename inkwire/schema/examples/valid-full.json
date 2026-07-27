@@ -1,0 +1,5 @@
+{ "external_id": "gen-2", "title": "Full", "markdown": "Body",
+  "slug": "full-post", "excerpt": "e", "tags": ["seo","ai"],
+  "cover_image_url": "https://x.test/c.jpg", "canonical_url": "https://x.test/p",
+  "author": { "name": "Isaac", "email": "i@x.test" },
+  "status": "published", "published_at": "2026-07-22T04:00:00Z" }
