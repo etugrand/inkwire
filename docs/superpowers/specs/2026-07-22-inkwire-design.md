@@ -1,6 +1,8 @@
-# Blog Publish Protocol (BPP) v1 — Design
+# Inkwire v1 — Design
 
 **Status:** Approved (design). **Date:** 2026-07-22.
+
+*Inkwire — the standard for wiring a blog post into any of your sites.*
 
 ## Problem
 
@@ -14,6 +16,21 @@ portable to DB-backed apps, no per-site auth, no idempotency.
 
 One **standard** every site implements so any authorized caller can create/update
 a blog post with a single HTTP request. Reusable across heterogeneous stacks.
+
+## Prior art (why REST/JSON, not the alternatives)
+
+Inkwire is a REST + JSON over HTTPS protocol — the modern standard for this job.
+Deliberately chosen over the alternatives:
+
+- **XML-RPC** — what WordPress historically used for remote publishing. Heavier
+  (XML), and a well-known security footgun (commonly disabled). Inkwire is its
+  REST successor.
+- **AtomPub (Atom Publishing Protocol)** — HTTP-based create/update over the Atom
+  format. Same idea, legacy/enterprise-syndication encoding. Superseded by plain
+  JSON REST for our use.
+- **Git / webhook** (static-site generators) — still genuinely useful for static
+  targets. Inkwire keeps the *same wire contract* but allows a **git/webhook
+  receiver flavor** (see Receivers) instead of a DB insert.
 
 ## Non-goals (v1)
 
@@ -38,7 +55,7 @@ Anaella (hub) ──Website/Blog provider──▶ site-A/B  POST /api/posts   (
 Anaella MCP (create_post) ── agents publish through the hub
 ```
 
-BPP defines the wire contract. Receivers implement it against local storage.
+Inkwire defines the wire contract. Receivers implement it against local storage.
 Callers (SDK, Anaella) speak it. **No standalone MCP** — Anaella's MCP covers
 agent publishing once Blog channels exist.
 
@@ -90,7 +107,7 @@ Idempotency-Key: gen-2026-07-22-abc        # optional; defaults to external_id
 
 `created: false` means an existing post (same `external_id`) was updated.
 
-Response header: `Blog-Protocol-Version: 1`.
+Response header: `Inkwire-Version: 1`.
 
 ### Semantics
 
@@ -120,7 +137,7 @@ Response header: `Blog-Protocol-Version: 1`.
 
 ### Versioning
 
-`Blog-Protocol-Version: 1`. Only additive changes within v1 (new optional
+`Inkwire-Version: 1`. Only additive changes within v1 (new optional
 fields). Breaking changes bump to `/api/posts` v2 (path or header negotiated).
 
 ---
@@ -167,6 +184,16 @@ savePost(post: NormalizedPost) -> { id, url, slug, created }
 Storage stays the app's own (Postgres, SQLite, files — whatever). The protocol,
 validation, rendering, and sanitization are uniform; only `savePost` is per-app.
 
+**Receiver flavors** — same wire contract, different back end behind `savePost`:
+
+- **DB / API flavor** (default) — insert/upsert into the app's database. Instant
+  publish. Used by DB-backed custom apps.
+- **Git / webhook flavor** (static sites — GitHub Pages, Netlify) — `savePost`
+  commits a markdown file to the content repo and lets the build pipeline
+  publish. `created`/`url` are derived from the committed path. Lets Inkwire cover
+  static targets without changing the caller side at all. Deferred past Phase 1 —
+  documented now so the contract stays flavor-agnostic.
+
 ### 3. Client SDK (`clients/`)
 Tiny publish helper for callers:
 
@@ -181,7 +208,7 @@ typed errors (`Unauthorized`, `InvalidPayload`, `Conflict`, `RateLimited`).
 - `clients/node/` (fetch).
 
 ### 4. Anaella "Website / Blog" channel provider (in the anaella repo)
-Makes Anaella a first-class BPP caller — scheduling, bulk, calendar, analytics,
+Makes Anaella a first-class Inkwire caller — scheduling, bulk, calendar, analytics,
 and its **existing MCP `create_post`** all work for blogs.
 
 - **`article` post type** added to Anaella's `Post` model (title + long markdown +
@@ -190,8 +217,8 @@ and its **existing MCP `create_post`** all work for blogs.
 - **Provider triad** under `apps/api/src/modules/channels/providers/website/`:
   - `website-channel.authenticator.ts` — "connect a site": store `base_url` +
     `api_key` as the channel integration credentials.
-  - `website-channel.publisher.ts` — `postArticle()` → BPP `POST /api/posts` via
-    the Node client SDK.
+  - `website-channel.publisher.ts` — `postArticle()` → Inkwire `POST /api/posts`
+    via the Node client SDK.
   - `website-channel.manager.ts` — wiring/registration.
 
 ---
@@ -199,9 +226,9 @@ and its **existing MCP `create_post`** all work for blogs.
 ## Implementation phases
 
 - **Phase 1 — Foundation (first plan):** `SPEC.md` + JSON Schema, the three
-  reference receivers, the two client SDKs, in the `blog-protocol/` repo. Prove
-  it by wiring the Next.js receiver into one real site (DadSEO's blog can become a
-  BPP consumer) and publishing via the SDK end to end.
+  reference receivers, the two client SDKs, in the `inkwire/` repo. Prove it by
+  wiring the Next.js receiver into one real site (DadSEO's blog can become an
+  Inkwire consumer) and publishing via the SDK end to end.
 - **Phase 2 — Anaella hub (second plan, anaella repo):** `article` post type +
   Website/Blog provider. Depends only on the frozen Phase-1 contract.
 
@@ -219,5 +246,5 @@ contract.
 - **Receiver unit tests:** validation + sanitization per language.
 - **Client SDK tests:** retry/backoff on 429/5xx, typed-error mapping, idempotency
   header.
-- **Anaella:** provider publish path against a mock BPP receiver; `article` type
-  model tests.
+- **Anaella:** provider publish path against a mock Inkwire receiver; `article`
+  type model tests.
