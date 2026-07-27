@@ -31,7 +31,10 @@ async def handle_post(auth_header, raw_body, api_keys, store):
         html = render_markdown(p.markdown)
         result = await store.upsert(key, {
             "external_id": p.external_id, "title": p.title, "html": html, "markdown": p.markdown,
-            "slug": slug, "status": p.status,
+            "slug": slug,
+            "excerpt": p.excerpt, "tags": p.tags, "cover_image_url": p.cover_image_url,
+            "canonical_url": p.canonical_url, "author": p.author.model_dump() if p.author else None,
+            "status": p.status,
             "published_at": p.published_at or datetime.now(timezone.utc).isoformat(),
         })
         return 200, {"id": result["id"], "external_id": p.external_id, "url": result["url"],

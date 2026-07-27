@@ -12,8 +12,8 @@
     "slug": { "type": "string", "maxLength": 255, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "excerpt": { "type": "string", "maxLength": 1024 },
     "tags": { "type": "array", "items": { "type": "string", "maxLength": 64 }, "maxItems": 50 },
-    "cover_image_url": { "type": "string", "format": "uri" },
-    "canonical_url": { "type": "string", "format": "uri" },
+    "cover_image_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "canonical_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
     "author": {
       "type": "object", "additionalProperties": false,
       "properties": { "name": { "type": "string" }, "email": { "type": "string", "format": "email" } }

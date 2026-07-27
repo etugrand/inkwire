@@ -22,20 +22,23 @@ This reference implementation uses `MemoryStore` from `@inkwire/receiver-core` f
 
 To adapt this for your app:
 
-1. Create a `PostStore` implementation that interfaces with your database:
+1. Create a `PostStore` implementation that interfaces with your database. Every
+   method takes a `key` — the value `authorize()` resolved the caller's API key
+   to — so a single store can multi-tenant across sites/keys without them
+   colliding on slug or external_id:
    ```typescript
-   import { type PostStore } from "@inkwire/receiver-core";
+   import { type PostStore, type StoredPost, type UpsertInput } from "@inkwire/receiver-core";
 
    export class MyPostStore implements PostStore {
-     async upsert(post: Post): Promise<Post> {
+     async findByExternalId(key: string, externalId: string): Promise<StoredPost | null> {
        // Your database logic here
      }
 
-     async getBySlug(slug: string): Promise<Post | null> {
+     async findBySlug(key: string, slug: string): Promise<StoredPost | null> {
        // Your database logic here
      }
 
-     async getByExternalId(externalId: string): Promise<Post | null> {
+     async upsert(key: string, post: UpsertInput): Promise<{ id: string; url: string; slug: string; created: boolean }> {
        // Your database logic here
      }
    }

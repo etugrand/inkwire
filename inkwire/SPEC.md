@@ -102,4 +102,33 @@ strip `<script>`, event handlers (`on*`), `javascript:` URIs, and disallowed
 tags. Callers never ship executable HTML. This is baked into the reference
 receivers so every app is safe by default.
 
+**Canonical allowlist (normative).** Every receiver's sanitizer MUST allow
+exactly this set — no more, no less. It is `sanitize-html`'s default
+`allowedTags` unioned with `img` (`h1`/`h2` are already in that default set):
+
+```
+a, abbr, address, article, aside, b, bdi, bdo, blockquote, br, caption, cite,
+code, col, colgroup, data, dd, dfn, div, dl, dt, em, figcaption, figure,
+footer, h1, h2, h3, h4, h5, h6, header, hgroup, hr, i, img, kbd, li, main,
+mark, menu, nav, ol, p, pre, q, rb, rp, rt, rtc, ruby, s, samp, section,
+small, span, strong, sub, sup, table, tbody, td, tfoot, th, thead, time, tr,
+u, ul, var, wbr
+```
+
+Only two tags keep any attributes; every other tag is stripped of all
+attributes:
+
+| Tag | Allowed attributes |
+| --- | --- |
+| `a` | `href`, `name`, `rel` |
+| `img` | `src`, `alt`, `title` |
+
+Allowed URL schemes (for `href`/`src`, and enforced separately on
+`cover_image_url`/`canonical_url`, which are never rendered as markdown):
+`http`, `https`, `mailto`.
+
+`cover_image_url` and `canonical_url` are plain URL fields, not markdown —
+they bypass the HTML sanitizer entirely and go straight to storage, so they
+are independently restricted to `http://`/`https://` at the schema level.
+
 ---
