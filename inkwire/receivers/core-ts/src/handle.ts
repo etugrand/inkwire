@@ -47,8 +47,13 @@ export async function handlePost(input: {
   }
 }
 
+const MAX_SLUG_LENGTH = 255;
+
 async function dedupeSlug(store: PostStore, key: string, base: string): Promise<string> {
   let slug = base, n = 1;
-  while (await store.findBySlug(key, slug)) slug = `${base}-${++n}`;
+  while (await store.findBySlug(key, slug)) {
+    const suffix = `-${++n}`;
+    slug = base.slice(0, MAX_SLUG_LENGTH - suffix.length) + suffix;
+  }
   return slug;
 }

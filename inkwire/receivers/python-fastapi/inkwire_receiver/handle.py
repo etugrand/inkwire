@@ -6,10 +6,14 @@ from .render import render_markdown, slugify
 from .errors import InkwireError
 HEADERS = {"Inkwire-Version": "1"}
 
+MAX_SLUG_LENGTH = 255
+
 async def _dedupe_slug(store, key, base):
     slug, n = base, 1
     while await store.find_by_slug(key, slug):
-        n += 1; slug = f"{base}-{n}"
+        n += 1
+        suffix = f"-{n}"
+        slug = base[:MAX_SLUG_LENGTH - len(suffix)] + suffix
     return slug
 
 async def handle_post(auth_header, raw_body, api_keys, store):

@@ -58,3 +58,12 @@ def test_bad_published_at_400():
 def test_author_extra_field_400():
     r = client.post("/api/posts", headers=AUTH, json={"external_id": "i", "title": "T", "markdown": "x", "author": {"name": "A", "unexpected": "nope"}})
     assert r.status_code == 400 and r.json()["error"]["code"] == "invalid_payload"
+
+def test_dedupe_slug_stays_within_length_cap():
+    long_title = "a" * 300
+    first = client.post("/api/posts", headers=AUTH, json={"external_id": "long-1", "title": long_title, "markdown": "x"})
+    second = client.post("/api/posts", headers=AUTH, json={"external_id": "long-2", "title": long_title, "markdown": "x"})
+    first_slug, second_slug = first.json()["slug"], second.json()["slug"]
+    assert len(first_slug) == 255
+    assert len(second_slug) <= 255
+    assert second_slug != first_slug

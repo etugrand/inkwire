@@ -41,6 +41,19 @@ it("rejects bad auth with 401", async () => {
   expect((r.body as any).error.code).toBe("unauthorized");
 });
 
+it("dedupes a 255-char slug without exceeding the length cap", async () => {
+  const longTitle = "a".repeat(300);
+  const first = await handlePost({ authHeader: auth, apiKeys: keys, store,
+    rawBody: { external_id: "long-1", title: longTitle, markdown: "x" } });
+  const second = await handlePost({ authHeader: auth, apiKeys: keys, store,
+    rawBody: { external_id: "long-2", title: longTitle, markdown: "x" } });
+  const firstSlug = (first.body as any).slug as string;
+  const secondSlug = (second.body as any).slug as string;
+  expect(firstSlug.length).toBe(255);
+  expect(secondSlug.length).toBeLessThanOrEqual(255);
+  expect(secondSlug).not.toBe(firstSlug);
+});
+
 it("409 on explicit slug owned by a different external_id", async () => {
   await handlePost({ authHeader: auth, apiKeys: keys, store,
     rawBody: { external_id: "owner", title: "O", markdown: "x", slug: "taken" } });

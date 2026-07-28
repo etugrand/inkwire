@@ -1,5 +1,5 @@
 {
-  "name": "inkwire-receiver-core", "version": "0.1.0", "type": "module",
+  "name": "inkwire-receiver-core", "version": "0.1.1", "type": "module",
   "description": "Shared TS core (validate, render, sanitize, upsert) for building an Inkwire receiver.",
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/etugrand/inkwire.git", "directory": "inkwire/receivers/core-ts" },
