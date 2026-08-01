@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { InkwireError } from "./errors";
+import { InkwireError } from "./errors.js";
 function eq(a: string, b: string) {
   const ab = Buffer.from(a), bb = Buffer.from(b);
   return ab.length === bb.length && timingSafeEqual(ab, bb);

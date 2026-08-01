@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { handlePost, type PostStore } from "../handle";
-import { MemoryStore, type UpsertInput } from "../store";
+import { handlePost, type PostStore } from "../handle.js";
+import { MemoryStore, type UpsertInput } from "../store.js";
 
 let store: PostStore;
 const keys = ["secret-key"];

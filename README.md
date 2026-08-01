@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/inkwire-client.svg)](https://www.npmjs.com/package/inkwire-client)
 [![PyPI](https://img.shields.io/pypi/v/inkwire-client.svg)](https://pypi.org/project/inkwire-client/)
+[![Receiver PyPI](https://img.shields.io/pypi/v/inkwire-receiver-core.svg)](https://pypi.org/project/inkwire-receiver-core/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A small, open protocol for publishing blog posts from any CMS or tool into any receiving website — REST + JSON, one endpoint, upsert semantics, server-side sanitization, and portable SEO defaults.
@@ -111,7 +112,7 @@ publish("http://localhost:3000", "dev-key", {
 
 ## Status
 
-v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Published: `inkwire-client` on [npm](https://www.npmjs.com/package/inkwire-client) and [PyPI](https://pypi.org/project/inkwire-client/), and `inkwire-receiver-core` on [npm](https://www.npmjs.com/package/inkwire-receiver-core). The Python receiver core is still consumed in-repo only, not yet published.
+v1, protocol-complete: frozen schema, conformance suite, three reference receivers (Express, Next.js, FastAPI) sharing one contract, two client SDKs, and a real end-to-end integration proven against a live site. Published: `inkwire-client` on [npm](https://www.npmjs.com/package/inkwire-client) and [PyPI](https://pypi.org/project/inkwire-client/), and `inkwire-receiver-core` on [npm](https://www.npmjs.com/package/inkwire-receiver-core) and [PyPI](https://pypi.org/project/inkwire-receiver-core/).
 
 ## License
 

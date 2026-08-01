@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { renderMarkdown } from "../render";
+import { renderMarkdown } from "../render.js";
 
 describe("renderMarkdown", () => {
   it("renders markdown to html", () => {

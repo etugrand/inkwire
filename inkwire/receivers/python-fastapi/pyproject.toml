@@ -1,9 +1,24 @@
 [project]
-name = "inkwire-receiver"
+name = "inkwire-receiver-core"
 version = "0.1.0"
+description = "Shared Python core for building an Inkwire blog-post receiver."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Isaac Gounton" }]
 requires-python = ">=3.11"
-dependencies = ["fastapi>=0.115", "markdown>=3.7", "nh3>=0.2.18", "email-validator>=2.0"]
+dependencies = ["pydantic>=2.9", "markdown>=3.7", "nh3>=0.2.18", "email-validator>=2.0"]
+
+[project.urls]
+Repository = "https://github.com/etugrand/inkwire"
+Documentation = "https://github.com/etugrand/inkwire/blob/master/inkwire/SPEC.md"
+
 [project.optional-dependencies]
-dev = ["pytest>=8.3", "httpx>=0.27", "uvicorn>=0.30"]
+fastapi = ["fastapi>=0.115"]
+dev = ["fastapi>=0.115", "pytest>=8.3", "httpx>=0.27", "uvicorn>=0.30"]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools.packages.find]
 include = ["inkwire_receiver*"]

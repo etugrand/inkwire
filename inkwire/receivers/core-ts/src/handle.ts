@@ -1,9 +1,9 @@
-import { PostInput } from "./schema";
-import { authorize } from "./auth";
-import { renderMarkdown, slugify } from "./render";
-import { InkwireError } from "./errors";
-import type { PostStore } from "./store";
-export type { PostStore } from "./store";
+import { PostInput } from "./schema.js";
+import { authorize } from "./auth.js";
+import { renderMarkdown, slugify } from "./render.js";
+import { InkwireError } from "./errors.js";
+import type { PostStore } from "./store.js";
+export type { PostStore } from "./store.js";
 
 const HEADERS = { "Inkwire-Version": "1", "content-type": "application/json" };
 

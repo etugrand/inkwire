@@ -1,10 +1,10 @@
 {
-  "name": "inkwire-receiver-core", "version": "0.1.1", "type": "module",
+  "name": "inkwire-receiver-core", "version": "0.2.0", "type": "module",
   "description": "Shared TS core (validate, render, sanitize, upsert) for building an Inkwire receiver.",
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/etugrand/inkwire.git", "directory": "inkwire/receivers/core-ts" },
   "main": "dist/index.js", "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist/*.js", "dist/*.d.ts"],
   "scripts": { "build": "tsc", "test": "vitest run" },
   "dependencies": { "zod": "^3.23.8", "markdown-it": "^14.1.0", "sanitize-html": "^2.13.1" },
   "devDependencies": { "vitest": "^2.1.0", "typescript": "^5.5.0",
