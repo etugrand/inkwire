@@ -33,11 +33,18 @@ async def handle_post(auth_header, raw_body, api_keys, store):
             existing = await store.find_by_external_id(key, p.external_id)
             slug = existing["slug"] if existing else await _dedupe_slug(store, key, slugify(p.title))
         html = render_markdown(p.markdown)
+        seo = {
+            "title": p.seo.title if p.seo and p.seo.title is not None else p.title,
+            "description": p.seo.description if p.seo and p.seo.description is not None else (p.excerpt or p.title),
+            "image_url": p.seo.image_url if p.seo and p.seo.image_url is not None else p.cover_image_url,
+            "noindex": p.seo.noindex if p.seo else False,
+        }
         result = await store.upsert(key, {
             "external_id": p.external_id, "title": p.title, "html": html, "markdown": p.markdown,
             "slug": slug,
             "excerpt": p.excerpt, "tags": p.tags, "cover_image_url": p.cover_image_url,
-            "canonical_url": p.canonical_url, "author": p.author.model_dump() if p.author else None,
+            "canonical_url": p.canonical_url, "seo": seo,
+            "author": p.author.model_dump() if p.author else None,
             "status": p.status,
             "published_at": p.published_at or datetime.now(timezone.utc).isoformat(),
         })

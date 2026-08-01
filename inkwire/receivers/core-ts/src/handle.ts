@@ -31,10 +31,16 @@ export async function handlePost(input: {
     }
 
     const html = renderMarkdown(p.markdown);
+    const seo = {
+      title: p.seo?.title ?? p.title,
+      description: p.seo?.description ?? (p.excerpt || p.title),
+      image_url: p.seo?.image_url ?? p.cover_image_url,
+      noindex: p.seo?.noindex ?? false,
+    };
     const result = await input.store.upsert(key, {
       external_id: p.external_id, title: p.title, html, markdown: p.markdown, slug,
       excerpt: p.excerpt, tags: p.tags, cover_image_url: p.cover_image_url,
-      canonical_url: p.canonical_url, author: p.author, status: p.status,
+      canonical_url: p.canonical_url, seo, author: p.author, status: p.status,
       published_at: p.published_at ?? new Date().toISOString(),
     });
     return { status: 200, headers: HEADERS, body: {

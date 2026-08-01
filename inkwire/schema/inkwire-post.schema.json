@@ -14,6 +14,16 @@
     "tags": { "type": "array", "items": { "type": "string", "maxLength": 64 }, "maxItems": 50 },
     "cover_image_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
     "canonical_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "image_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "noindex": { "type": "boolean", "default": false }
+      }
+    },
     "author": {
       "type": "object", "additionalProperties": false,
       "properties": { "name": { "type": "string" }, "email": { "type": "string", "format": "email" } }

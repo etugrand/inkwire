@@ -27,6 +27,12 @@ Idempotency-Key: gen-2026-07-22-abc        # optional; defaults to external_id
   "tags": ["seo", "ai"],                  // optional. string[].
   "cover_image_url": "https://.../c.jpg", // optional. URL only in v1.
   "canonical_url": "https://origin/post", // optional. Cross-post SEO.
+  "seo": {                                // optional SEO Profile 1 overrides.
+    "title": "Search result title",
+    "description": "Search result description",
+    "image_url": "https://.../og.jpg",
+    "noindex": false
+  },
   "author": { "name": "Isaac", "email": "i@x.com" }, // optional.
   "status": "published",                  // "published" | "draft". Default "draft".
   "published_at": "2026-07-22T04:00:00Z"  // optional ISO-8601. Default now().
@@ -61,6 +67,53 @@ Response header: `Inkwire-Version: 1`.
   owns, the receiver returns `409 conflict` rather than silently changing it.
   Final slug is always returned in the response.
 - **Status:** `draft` posts are stored but not publicly listed/rendered.
+
+### SEO Profile 1
+
+SEO Profile 1 is part of the post contract, not a separate endpoint. The
+optional `seo` object contains overrides only; receivers derive effective SEO
+metadata for every post and pass it to their storage/rendering integration:
+
+```text
+title       = seo.title       ?? title
+description = seo.description ?? first non-empty value of (excerpt, title)
+image_url   = seo.image_url   ?? cover_image_url (may be absent)
+noindex     = seo.noindex     ?? false
+canonical   = canonical_url   ?? the post's absolute public URL
+```
+
+`seo.title` and `seo.description` must be non-empty when provided. SEO URLs
+must use `http://` or `https://`. Unknown properties are invalid. Existing
+top-level fields remain authoritative for canonical URL, author, publication
+date, and tags; the profile does not duplicate them inside `seo`.
+
+A receiver core conforms to the **SEO input profile** when it validates these
+overrides and supplies the effective `title`, `description`, `image_url`, and
+`noindex` values to the application-owned store. The public URL is only known
+after the store finalizes the post, so the page renderer applies the canonical
+fallback.
+
+A site may additionally claim **SEO rendering conformance** for publicly
+accessible `published` posts. Its returned HTML page must safely render:
+
+- one document `<title>` using the effective title;
+- `description`, canonical, `og:type=article`, `og:title`, `og:description`, and
+  `og:url` tags using the effective values;
+- `twitter:card`, `twitter:title`, and `twitter:description` tags;
+- `og:image` and `twitter:image` when an effective image exists;
+- `<meta name="robots" content="noindex,follow">` when `noindex` is true; and
+- JSON-LD with `@context: https://schema.org`, `@type: BlogPosting`, `headline`,
+  `description`, `url`, `mainEntityOfPage`, and `datePublished`, plus `image`,
+  `author`, and `keywords` when their source fields exist.
+
+When present, JSON-LD `author` is a `Person` object with `name`, and `keywords`
+is an array containing the post tags. `mainEntityOfPage` may be the canonical URL
+string or a `WebPage` object whose `@id` is that URL.
+
+Metadata values must be HTML-escaped. JSON-LD must be serialized so
+caller-controlled text cannot terminate its `<script>` element. Additional
+site-wide metadata is allowed. Draft posts remain non-public under the base
+protocol and cannot claim rendering conformance.
 
 ### Errors
 
@@ -127,7 +180,7 @@ Allowed URL schemes (for `href`/`src`, and enforced separately on
 `cover_image_url`/`canonical_url`, which are never rendered as markdown):
 `http`, `https`, `mailto`.
 
-`cover_image_url` and `canonical_url` are plain URL fields, not markdown —
+`cover_image_url`, `canonical_url`, and `seo.image_url` are plain URL fields, not markdown —
 they bypass the HTML sanitizer entirely and go straight to storage, so they
 are independently restricted to `http://`/`https://` at the schema level.
 

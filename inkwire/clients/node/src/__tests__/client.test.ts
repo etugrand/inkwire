@@ -13,6 +13,14 @@ it("publishes and returns the result", async () => {
   expect(call[1].headers["idempotency-key"]).toBe("e");
 });
 
+it("sends SEO overrides unchanged", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => ok({ id: "1", external_id: "e", url: "u", slug: "s", status: "draft", created: true })));
+  const seo = { title: "Search title", description: "Search description", image_url: "https://images.test/og.jpg", noindex: true };
+  await publish("https://site.test", "k", { external_id: "e", title: "T", markdown: "x", seo });
+  const call = (fetch as any).mock.calls[0];
+  expect(JSON.parse(call[1].body).seo).toEqual(seo);
+});
+
 it("retries on 500 then succeeds", async () => {
   const fetchMock = vi.fn()
     .mockResolvedValueOnce(new Response("{}", { status: 500 }))

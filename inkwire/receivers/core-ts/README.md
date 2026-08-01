@@ -1,6 +1,6 @@
 # inkwire-receiver-core
 
-Shared TypeScript core for building an [Inkwire](https://github.com/etugrand/inkwire) receiver: validate the incoming payload against the frozen schema, render+sanitize markdown to HTML, and upsert by `external_id` against a `PostStore` you provide.
+Shared TypeScript core for building an [Inkwire](https://github.com/etugrand/inkwire) receiver: validate the incoming payload, derive SEO metadata, render+sanitize markdown to HTML, and upsert by `external_id` against a `PostStore` you provide.
 
 ```ts
 import { handlePost, MemoryStore } from "inkwire-receiver-core";
@@ -20,6 +20,7 @@ This package is the shared logic behind the [Express](https://github.com/etugran
 
 - `handlePost(input)` — the whole request lifecycle: auth, validation, slugging, sanitization, store upsert.
 - `type PostStore` — the interface your storage backend must implement (`findByExternalId`, `findBySlug`, `upsert`).
+- `type SeoMetadata` — effective title, description, image, and indexing values passed to `PostStore.upsert`.
 - `MemoryStore` — an in-memory `PostStore` for local dev/testing.
 - `renderMarkdown`, `slugify` — the sanitization and slug-generation helpers `handlePost` uses internally.
 - `InkwireError` — typed error class mapping to the protocol's error codes.

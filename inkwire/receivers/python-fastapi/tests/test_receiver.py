@@ -3,6 +3,9 @@ import os
 os.environ["INKWIRE_API_KEYS"] = "secret-key"
 from app import app
 from inkwire_receiver.render import render_markdown
+from inkwire_receiver.handle import handle_post
+from inkwire_receiver.store import MemoryStore
+import asyncio
 
 client = TestClient(app)
 AUTH = {"Authorization": "Bearer secret-key"}
@@ -67,3 +70,57 @@ def test_dedupe_slug_stays_within_length_cap():
     assert len(first_slug) == 255
     assert len(second_slug) <= 255
     assert second_slug != first_slug
+
+class CapturingStore(MemoryStore):
+    captured = None
+
+    async def upsert(self, key, post):
+        self.captured = post
+        return await super().upsert(key, post)
+
+def test_derives_effective_seo_metadata():
+    store = CapturingStore()
+    status, _, _ = asyncio.run(handle_post("Bearer secret-key", {
+        "external_id": "seo-derived", "title": "Post title", "markdown": "x",
+        "excerpt": "Post excerpt", "cover_image_url": "https://images.test/cover.jpg",
+    }, ["secret-key"], store))
+    assert status == 200
+    assert store.captured["seo"] == {
+        "title": "Post title", "description": "Post excerpt",
+        "image_url": "https://images.test/cover.jpg", "noindex": False,
+    }
+
+def test_applies_seo_overrides_independently():
+    store = CapturingStore()
+    status, _, _ = asyncio.run(handle_post("Bearer secret-key", {
+        "external_id": "seo-overrides", "title": "Post title", "markdown": "x",
+        "excerpt": "Post excerpt", "cover_image_url": "https://images.test/cover.jpg",
+        "seo": {"title": "Search title", "image_url": "https://images.test/social.jpg", "noindex": True},
+    }, ["secret-key"], store))
+    assert status == 200
+    assert store.captured["seo"] == {
+        "title": "Search title", "description": "Post excerpt",
+        "image_url": "https://images.test/social.jpg", "noindex": True,
+    }
+
+def test_invalid_nested_seo_400():
+    unknown = client.post("/api/posts", headers=AUTH, json={
+        "external_id": "seo-invalid-1", "title": "T", "markdown": "x", "seo": {"keywords": ["x"]},
+    })
+    unsafe = client.post("/api/posts", headers=AUTH, json={
+        "external_id": "seo-invalid-2", "title": "T", "markdown": "x", "seo": {"image_url": "javascript:alert(1)"},
+    })
+    null = client.post("/api/posts", headers=AUTH, json={
+        "external_id": "seo-invalid-3", "title": "T", "markdown": "x", "seo": None,
+    })
+    nested_null = client.post("/api/posts", headers=AUTH, json={
+        "external_id": "seo-invalid-4", "title": "T", "markdown": "x", "seo": {"title": None},
+    })
+    coerced_bool = client.post("/api/posts", headers=AUTH, json={
+        "external_id": "seo-invalid-5", "title": "T", "markdown": "x", "seo": {"noindex": "false"},
+    })
+    assert unknown.status_code == 400
+    assert unsafe.status_code == 400
+    assert null.status_code == 400
+    assert nested_null.status_code == 400
+    assert coerced_bool.status_code == 400

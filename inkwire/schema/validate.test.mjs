@@ -15,3 +15,19 @@ test("missing title fails", () => {
   assert.equal(validate(load("invalid-missing-title.json")), false);
   assert.ok(validate.errors.some((e) => e.params.missingProperty === "title"));
 });
+test("partial seo overrides pass", () => {
+  assert.equal(validate({ external_id: "seo-1", title: "T", markdown: "x", seo: { noindex: true } }), true);
+});
+test("unknown seo properties fail", () => {
+  assert.equal(validate({ external_id: "seo-2", title: "T", markdown: "x", seo: { keywords: ["x"] } }), false);
+});
+test("empty seo title and description fail", () => {
+  assert.equal(validate({ external_id: "seo-3", title: "T", markdown: "x", seo: { title: "" } }), false);
+  assert.equal(validate({ external_id: "seo-4", title: "T", markdown: "x", seo: { description: "" } }), false);
+});
+test("non-http seo image and null seo fail", () => {
+  assert.equal(validate({ external_id: "seo-5", title: "T", markdown: "x", seo: { image_url: "javascript:alert(1)" } }), false);
+  assert.equal(validate({ external_id: "seo-6", title: "T", markdown: "x", seo: null }), false);
+  assert.equal(validate({ external_id: "seo-7", title: "T", markdown: "x", seo: { title: null } }), false);
+  assert.equal(validate({ external_id: "seo-8", title: "T", markdown: "x", seo: { noindex: "false" } }), false);
+});

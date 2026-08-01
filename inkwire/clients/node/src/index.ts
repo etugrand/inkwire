@@ -1,7 +1,10 @@
+export interface SeoPayload {
+  title?: string; description?: string; image_url?: string; noindex?: boolean;
+}
 export interface PostPayload {
   external_id: string; title: string; markdown: string;
   slug?: string; excerpt?: string; tags?: string[]; cover_image_url?: string;
-  canonical_url?: string; author?: { name?: string; email?: string };
+  canonical_url?: string; seo?: SeoPayload; author?: { name?: string; email?: string };
   status?: "draft" | "published"; published_at?: string;
 }
 export interface PublishResult {

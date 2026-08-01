@@ -1,8 +1,12 @@
 export interface StoredPost { id: string; slug: string; url: string; external_id: string; }
+export interface SeoMetadata {
+  title: string; description: string; image_url?: string; noindex: boolean;
+}
 export interface UpsertInput {
   external_id: string; title: string; html: string; markdown: string; slug: string;
   excerpt?: string; tags?: string[]; cover_image_url?: string; canonical_url?: string;
-  author?: { name?: string; email?: string }; status: "draft" | "published"; published_at: string;
+  seo: SeoMetadata; author?: { name?: string; email?: string };
+  status: "draft" | "published"; published_at: string;
 }
 export interface PostStore {
   findByExternalId(key: string, externalId: string): Promise<StoredPost | null>;

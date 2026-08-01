@@ -1,13 +1,15 @@
 import httpx
 import pytest
+import json
 from inkwire_client import publish, InkwireClientError
 
 
 def make_transport(responses):
-    calls = {"n": 0}
+    calls = {"n": 0, "requests": []}
     def handler(request):
         i = min(calls["n"], len(responses) - 1)
         calls["n"] += 1
+        calls["requests"].append(request)
         status, body = responses[i]
         return httpx.Response(status, json=body, headers={"inkwire-version": "1"})
     return httpx.MockTransport(handler), calls
@@ -18,6 +20,14 @@ def test_publish_ok(monkeypatch):
     monkeypatch.setattr("inkwire_client._transport", transport, raising=False)
     r = publish("https://site.test", "k", {"external_id": "e", "title": "T", "markdown": "x"}, retries=1)
     assert r["created"] is True
+
+
+def test_publish_sends_seo_unchanged(monkeypatch):
+    transport, calls = make_transport([(200, {"id": "1", "external_id": "e", "url": "u", "slug": "s", "status": "draft", "created": True})])
+    monkeypatch.setattr("inkwire_client._transport", transport, raising=False)
+    seo = {"title": "Search title", "description": "Search description", "image_url": "https://images.test/og.jpg", "noindex": True}
+    publish("https://site.test", "k", {"external_id": "e", "title": "T", "markdown": "x", "seo": seo}, retries=1)
+    assert json.loads(calls["requests"][0].content)["seo"] == seo
 
 
 def test_retry_then_success(monkeypatch):

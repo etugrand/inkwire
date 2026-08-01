@@ -4,7 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/inkwire-client.svg)](https://pypi.org/project/inkwire-client/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A small, open protocol for publishing blog posts from any CMS or tool into any receiving website — REST + JSON, one endpoint, upsert semantics, server-side sanitization.
+A small, open protocol for publishing blog posts from any CMS or tool into any receiving website — REST + JSON, one endpoint, upsert semantics, server-side sanitization, and portable SEO defaults.
 
 ```
 POST /api/posts
@@ -44,6 +44,7 @@ A **receiver** is anything that implements `POST /api/posts` per the spec; `core
 - **Upsert on `external_id`**, scoped to the site/API key. Re-POST the same `external_id` to update in place — this is also how idempotency works. No separate PUT.
 - **Slug**: omit it and the receiver generates + de-dupes one silently (never 409). Provide one that collides with a *different* post's `external_id` and you get `409 conflict`.
 - **Markdown is canonical.** Receivers render it to sanitized HTML server-side (`markdown-it`/`sanitize-html` in TS, `markdown`/`nh3` in Python) — `<script>`, event handlers, and non-http(s) URI schemes are stripped/rejected everywhere, including `cover_image_url`/`canonical_url`.
+- **SEO Profile 1:** receivers derive search/social metadata from the post automatically. Callers may override `seo.title`, `seo.description`, `seo.image_url`, or `seo.noindex`; canonical, author, dates, and tags reuse the existing post fields.
 - **Every response** carries `Inkwire-Version: 1`. Errors are typed: `invalid_payload` (400), `unauthorized` (401), `conflict` (409), `rate_limited` (429), `internal` (500).
 
 ## Try it
@@ -56,12 +57,23 @@ cd inkwire/receivers/core-ts && npm install && npm run build
 cd ../node-express && npm install
 INKWIRE_API_KEYS=dev-key npm start &
 
-# 2. Run the conformance suite against it (15 cases: validation, auth, slugs, sanitization, formats):
+# 2. Run the conformance suite against it (validation, auth, slugs, sanitization, formats, SEO input):
 cd ../../conformance && npm install
-BASE_URL=http://localhost:3000 API_KEY=dev-key node runner.mjs
+BASE_URL=http://localhost:4000 API_KEY=dev-key node runner.mjs
 ```
 
 Same runner works unmodified against `receivers/nextjs` or `receivers/python-fastapi` — that's the point of a black-box conformance suite.
+
+The black-box runner proves SEO wire validation. Receiver-core unit tests must
+also prove that effective SEO metadata reaches the application-owned store.
+
+Sites that publicly render returned post URLs can separately run `seo-runner.mjs`
+to verify SEO Profile 1 page output. The demo receivers only implement the
+receiver API, so they claim input conformance but not rendered-page conformance.
+
+```bash
+BASE_URL=https://site.example API_KEY=site-key node seo-runner.mjs
+```
 
 ### Publish from Node
 
